@@ -52,23 +52,23 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
   onPlaceOrder,
   onCompleteInspection,
 }) => {
+  const [selectedPartId, setSelectedPartId] = useState<string>(
+    requisition?.confirmedPartId || catalogParts[0]?.id || ''
+  );
+  const [specConfirmNotes, setSpecConfirmNotes] = useState<string>('現場實體量測外徑與電阻正常，確認規格型號。');
+  const [supplierInput, setSupplierInput] = useState<string>(requisition?.supplierName || SUPPLIER_LIST[0].name);
+  const [quotedPriceInput, setQuotedPriceInput] = useState<number>(requisition?.quotedUnitPrice || 1850);
+  const [leadDaysInput, setLeadDaysInput] = useState<number>(requisition?.estimatedLeadDays || 4);
+  const [approvalRemarksInput, setApprovalRemarksInput] = useState<string>('核准採購，請採購儘速向配合廠商下單發貨。');
+  const [poNumberInput, setPoNumberInput] = useState<string>(requisition.poNumber || `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-01`);
+  const [actualPriceInput, setActualPriceInput] = useState<number>(requisition.quotedUnitPrice || 1850);
+  const [inspectionNotes, setInspectionNotes] = useState<string>('零件外觀無碰傷、尺寸與安裝孔位精確，驗收合格。');
+
   if (!requisition) return null;
 
   const statusInfo = STATUS_MAP[requisition.status];
   const isLineStop = requisition.urgency === 'LINE_STOP';
   const isUrgent = requisition.urgency === 'URGENT';
-
-  const [selectedPartId, setSelectedPartId] = useState<string>(
-    requisition.confirmedPartId || catalogParts[0]?.id || ''
-  );
-  const [specConfirmNotes, setSpecConfirmNotes] = useState<string>('現場實體量測外徑與電阻正常，確認規格型號。');
-  const [supplierInput, setSupplierInput] = useState<string>(requisition.supplierName || SUPPLIER_LIST[0].name);
-  const [quotedPriceInput, setQuotedPriceInput] = useState<number>(requisition.quotedUnitPrice || 1850);
-  const [leadDaysInput, setLeadDaysInput] = useState<number>(requisition.estimatedLeadDays || 4);
-  const [approvalRemarksInput, setApprovalRemarksInput] = useState<string>('核准採購，請採購儘速向配合廠商下單發貨。');
-  const [poNumberInput, setPoNumberInput] = useState<string>(requisition.poNumber || `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-01`);
-  const [actualPriceInput, setActualPriceInput] = useState<number>(requisition.quotedUnitPrice || 1850);
-  const [inspectionNotes, setInspectionNotes] = useState<string>('零件外觀無碰傷、尺寸與安裝孔位精確，驗收合格。');
 
   const currentPart = catalogParts.find((p) => p.id === selectedPartId);
   const stockAvailable = currentPart?.currentStock ?? 0;
