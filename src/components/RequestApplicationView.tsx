@@ -17,18 +17,21 @@ import {
   Eye,
   RefreshCw
 } from 'lucide-react';
-import { SparePart, UrgencyLevel, PurchaseRequisition, AiIdentificationResult, ProductionLineCode, EquipmentStationType } from '../types';
+import { SparePart, UrgencyLevel, PurchaseRequisition, AiIdentificationResult, ProductionLineCode, EquipmentStationType, UserRole } from '../types';
 import { EQUIPMENT_LIST, PRODUCTION_LINES } from '../data/mockData';
 import { SAMPLE_PHOTO_PRESETS, SamplePhotoPreset } from '../data/samplePhotos';
+import { ROLE_CONFIG } from './Header';
 
 interface RequestApplicationViewProps {
   catalogParts: SparePart[];
+  currentRole: UserRole;
   onSubmitRequisition: (newReq: Partial<PurchaseRequisition>) => void;
   onOpenPartDetail: (part: SparePart) => void;
 }
 
 export const RequestApplicationView: React.FC<RequestApplicationViewProps> = ({
   catalogParts,
+  currentRole,
   onSubmitRequisition,
   onOpenPartDetail,
 }) => {
@@ -40,7 +43,16 @@ export const RequestApplicationView: React.FC<RequestApplicationViewProps> = ({
   const [unit, setUnit] = useState<string>('個');
   const [urgency, setUrgency] = useState<UrgencyLevel>('LINE_STOP');
   const [knownPartCode, setKnownPartCode] = useState<string>('');
-  const [requesterName, setRequesterName] = useState<string>('陳志明 (現場操作員)');
+  const [requesterName, setRequesterName] = useState<string>(
+    `${ROLE_CONFIG[currentRole]?.userName || '陳志明'} (${ROLE_CONFIG[currentRole]?.title || '現場操作員'})`
+  );
+
+  // Sync requesterName whenever currentRole changes
+  React.useEffect(() => {
+    if (ROLE_CONFIG[currentRole]) {
+      setRequesterName(`${ROLE_CONFIG[currentRole].userName} (${ROLE_CONFIG[currentRole].title})`);
+    }
+  }, [currentRole]);
 
   // AI Analysis State
   const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
@@ -213,7 +225,7 @@ export const RequestApplicationView: React.FC<RequestApplicationViewProps> = ({
     const newRequisition: Partial<PurchaseRequisition> = {
       reqNumber: prNumber,
       requesterName,
-      requesterRole: '現場操作人員',
+      requesterRole: ROLE_CONFIG[currentRole]?.title || '現場操作人員',
       requestDate: new Date().toLocaleString('zh-TW', { hour12: false }),
       equipmentName: currentEquipment.name,
       equipmentCode: currentEquipment.code,
@@ -232,8 +244,8 @@ export const RequestApplicationView: React.FC<RequestApplicationViewProps> = ({
           timestamp: new Date().toLocaleString('zh-TW', { hour12: false }),
           status: 'PENDING_CONFIRMATION',
           actor: requesterName,
-          role: 'OPERATOR',
-          actionTitle: '現場作業員提出需求申請 (拍照提報)',
+          role: currentRole,
+          actionTitle: `${ROLE_CONFIG[currentRole]?.label || '現場作業員'}提出需求申請 (拍照提報)`,
           comment: `提報設備 ${currentEquipment.name} 零件故障。${knownPartCode ? `已知型號：${knownPartCode}` : selectedCandidateCode ? `AI建議候選：${selectedCandidateCode}` : '型號未知待確認'}`,
         },
       ],

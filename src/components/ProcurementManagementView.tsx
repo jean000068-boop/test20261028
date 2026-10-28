@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PurchaseRequisition, UserRole, SparePart } from '../types';
 import { SUPPLIER_LIST } from '../data/mockData';
+import { ROLE_CONFIG } from './Header';
 import { 
   ShoppingCart, 
   Search, 
@@ -70,6 +71,15 @@ export const ProcurementManagementView: React.FC<ProcurementManagementViewProps>
           <p className="text-xs text-slate-500">
             維修技術員核定規格且倉庫確認無存量後，採購迅速向專用零件廠商詢價並呈報主管核准。
           </p>
+        </div>
+
+        {/* Current Role Badge */}
+        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs shrink-0">
+          <UserCheck className="w-4 h-4 text-indigo-600" />
+          <span className="text-slate-500">目前採購操作人：</span>
+          <span className="font-bold text-slate-900">
+            {ROLE_CONFIG[currentRole]?.label} · {ROLE_CONFIG[currentRole]?.userName}
+          </span>
         </div>
       </div>
 

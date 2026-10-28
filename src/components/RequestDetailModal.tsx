@@ -6,6 +6,7 @@ import {
 } from '../types';
 import { STATUS_MAP } from './RequisitionsPipelineView';
 import { SUPPLIER_LIST } from '../data/mockData';
+import { ROLE_CONFIG } from './Header';
 import { 
   X, 
   Flame, 
@@ -71,6 +72,7 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
 
   const currentPart = catalogParts.find((p) => p.id === selectedPartId);
   const stockAvailable = currentPart?.currentStock ?? 0;
+  const currentActor = `${ROLE_CONFIG[currentRole]?.userName || '系統使用者'} (${ROLE_CONFIG[currentRole]?.title || '操作員'})`;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
@@ -103,6 +105,11 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
             )}
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusInfo.color}`}>
               {statusInfo.label}
+            </span>
+
+            {/* Current simulated role badge */}
+            <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold ml-auto">
+              目前簽核人：{ROLE_CONFIG[currentRole]?.label} · {ROLE_CONFIG[currentRole]?.userName}
             </span>
           </div>
 
@@ -236,23 +243,23 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
                 {stockAvailable >= requisition.requestedQuantity ? (
                   <button
                     onClick={() => {
-                      onConfirmSpec(requisition.id, selectedPartId, '王建國 (維修組長)', specConfirmNotes);
-                      onDirectIssueStock(requisition.id, '吳大雄 (倉管員)');
+                      onConfirmSpec(requisition.id, selectedPartId, currentActor, specConfirmNotes);
+                      onDirectIssueStock(requisition.id, currentActor);
                     }}
                     className="flex-1 py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs"
                   >
                     <Boxes className="w-4 h-4" />
-                    <span>庫存充足：核定並直接領料出庫 (結案)</span>
+                    <span>庫存充足：以【{ROLE_CONFIG[currentRole]?.userName}】簽核並直接出庫 (結案)</span>
                   </button>
                 ) : (
                   <button
                     onClick={() => {
-                      onConfirmSpec(requisition.id, selectedPartId, '王建國 (維修組長)', specConfirmNotes);
+                      onConfirmSpec(requisition.id, selectedPartId, currentActor, specConfirmNotes);
                     }}
                     className="flex-1 py-2.5 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs"
                   >
                     <ArrowRight className="w-4 h-4" />
-                    <span>確認規格 (庫存不足，轉交採購詢價)</span>
+                    <span>以【{ROLE_CONFIG[currentRole]?.userName}】確認規格 (轉交採購詢價)</span>
                   </button>
                 )}
               </div>
@@ -333,11 +340,11 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
 
               <div className="pt-2">
                 <button
-                  onClick={() => onApproveRequisition(requisition.id, '李廠長 (主管)', approvalRemarksInput)}
+                  onClick={() => onApproveRequisition(requisition.id, currentActor, approvalRemarksInput)}
                   className="w-full py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs"
                 >
                   <UserCheck className="w-4 h-4" />
-                  <span>主管核准此筆採購 (轉入採購下單)</span>
+                  <span>以【{ROLE_CONFIG[currentRole]?.userName}】核准此筆採購 (轉入採購下單)</span>
                 </button>
               </div>
             </div>
@@ -352,11 +359,11 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
 
               <div className="pt-2">
                 <button
-                  onClick={() => onCompleteInspection(requisition.id, '王建國 (維修技師)', requisition.quotedUnitPrice || 1850, '到貨點收上機測試完成')}
+                  onClick={() => onCompleteInspection(requisition.id, currentActor, requisition.quotedUnitPrice || 1850, '到貨點收上機測試完成')}
                   className="w-full py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-xs"
                 >
                   <Truck className="w-4 h-4" />
-                  <span>零件已送達現場：執行到貨驗收與結案</span>
+                  <span>以【{ROLE_CONFIG[currentRole]?.userName}】執行到貨驗收合格與結案入庫</span>
                 </button>
               </div>
             </div>

@@ -12,7 +12,7 @@ import {
   ProductionLineCode
 } from './types';
 import { INITIAL_PARTS, INITIAL_REQUISITIONS } from './data/mockData';
-import { Header } from './components/Header';
+import { Header, ROLE_CONFIG } from './components/Header';
 import { Navigation, ActiveTab } from './components/Navigation';
 import { ProductionLinesBar } from './components/ProductionLinesBar';
 import { RequestApplicationView } from './components/RequestApplicationView';
@@ -89,12 +89,20 @@ export default function App() {
     (r) => r.status === 'PENDING_APPROVAL'
   ).length;
 
+  const handleRoleChange = (newRole: UserRole) => {
+    setCurrentRole(newRole);
+    // Switch to that role's primary workspace tab together
+    const targetTab = ROLE_CONFIG[newRole].defaultTab;
+    setActiveTab(targetTab);
+  };
+
   const handleAddNewRequisition = (newReq: Partial<PurchaseRequisition>) => {
+    const defaultActor = `${ROLE_CONFIG[currentRole].userName} (${ROLE_CONFIG[currentRole].title})`;
     const pr: PurchaseRequisition = {
       id: `req-${Date.now()}`,
       reqNumber: newReq.reqNumber || `PR-${Date.now()}`,
-      requesterName: newReq.requesterName || '現場操作員',
-      requesterRole: newReq.requesterRole || '現場操作人員',
+      requesterName: newReq.requesterName || defaultActor,
+      requesterRole: newReq.requesterRole || ROLE_CONFIG[currentRole].title,
       requestDate: newReq.requestDate || new Date().toLocaleString('zh-TW', { hour12: false }),
       equipmentName: newReq.equipmentName || '造粒擠出機',
       equipmentCode: newReq.equipmentCode || 'EXT-01',
@@ -113,9 +121,11 @@ export default function App() {
     setRequisitions((prev) => [pr, ...prev]);
   };
 
-  const handleConfirmSpec = (reqId: string, partId: string, technicianName: string, notes?: string) => {
+  const handleConfirmSpec = (reqId: string, partId: string, technicianName?: string, notes?: string) => {
     const targetPart = catalogParts.find((p) => p.id === partId);
     if (!targetPart) return;
+
+    const actor = technicianName || `${ROLE_CONFIG[currentRole].userName} (${ROLE_CONFIG[currentRole].title})`;
 
     setRequisitions((prev) =>
       prev.map((r) => {
@@ -128,7 +138,7 @@ export default function App() {
           confirmedPartCode: targetPart.code,
           confirmedPartName: targetPart.name,
           confirmedSpecs: targetPart.specs,
-          confirmedBy: technicianName,
+          confirmedBy: actor,
           confirmedAt: new Date().toLocaleString('zh-TW', { hour12: false }),
           status: nextStatus,
           timeline: [
@@ -137,7 +147,7 @@ export default function App() {
               id: `tl-${Date.now()}`,
               timestamp: new Date().toLocaleString('zh-TW', { hour12: false }),
               status: nextStatus,
-              actor: technicianName,
+              actor: actor,
               role: 'TECHNICIAN',
               actionTitle: `維修技術人員核定零件為 ${targetPart.code}`,
               comment: notes || `確認規格符合設備 ${r.equipmentName}，轉交採購進行詢價。`,
@@ -400,7 +410,7 @@ export default function App() {
       {/* Top Application Header */}
       <Header
         currentRole={currentRole}
-        onRoleChange={setCurrentRole}
+        onRoleChange={handleRoleChange}
         activeLineStopCount={activeLineStopCount}
         activeUrgentCount={activeUrgentCount}
         isMobileSimulated={isMobileSimulated}
@@ -452,6 +462,7 @@ export default function App() {
           {activeTab === 'REQUEST' && (
             <RequestApplicationView
               catalogParts={catalogParts}
+              currentRole={currentRole}
               onSubmitRequisition={handleAddNewRequisition}
               onOpenPartDetail={(part) => setSelectedDetailPart(part)}
             />

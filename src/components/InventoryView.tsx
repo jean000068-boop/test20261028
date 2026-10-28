@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SparePart, UserRole } from '../types';
+import { ROLE_CONFIG } from './Header';
 import { 
   Boxes, 
   Search, 
@@ -11,7 +12,8 @@ import {
   CheckCircle2, 
   Clock, 
   Filter,
-  Eye
+  Eye,
+  UserCheck
 } from 'lucide-react';
 
 interface InventoryViewProps {
@@ -91,6 +93,15 @@ export const InventoryView: React.FC<InventoryViewProps> = ({
           <p className="text-xs text-slate-500">
             現場有庫存可直接領料出庫；無庫存時及時轉交採購詢價，杜絕等料停機損失。
           </p>
+        </div>
+
+        {/* Current Operator Badge */}
+        <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs shrink-0">
+          <UserCheck className="w-4 h-4 text-blue-600" />
+          <span className="text-slate-500">目前庫存經辦：</span>
+          <span className="font-bold text-slate-900">
+            {ROLE_CONFIG[currentRole]?.label} · {ROLE_CONFIG[currentRole]?.userName}
+          </span>
         </div>
       </div>
 

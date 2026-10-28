@@ -7,6 +7,7 @@ import {
   SparePart,
   ProductionLineCode
 } from '../types';
+import { ROLE_CONFIG } from './Header';
 import { 
   GitPullRequest, 
   Search, 
@@ -135,6 +136,67 @@ export const RequisitionsPipelineView: React.FC<RequisitionsPipelineViewProps> =
           </div>
         </div>
       </div>
+
+      {/* Role-Specific Action Focus Banner */}
+      {(() => {
+        const roleInfo = ROLE_CONFIG[currentRole];
+        if (!roleInfo) return null;
+
+        let focusText = '';
+        let targetFilter: string | null = null;
+        let buttonLabel = '';
+
+        if (currentRole === 'TECHNICIAN') {
+          const count = statusCounts['PENDING_CONFIRMATION'] || 0;
+          focusText = `待您核實規格與相容性的案件共有 ${count} 件`;
+          targetFilter = 'PENDING_CONFIRMATION';
+          buttonLabel = '聚焦：待確認規格';
+        } else if (currentRole === 'PROCUREMENT') {
+          const count = (statusCounts['PENDING_RFQ'] || 0);
+          focusText = `待您向廠商詢價並登錄報價的案件共有 ${count} 件`;
+          targetFilter = 'PENDING_RFQ';
+          buttonLabel = '聚焦：待詢價案件';
+        } else if (currentRole === 'SUPERVISOR') {
+          const count = statusCounts['PENDING_APPROVAL'] || 0;
+          focusText = `待您審核簽核的採購案件共有 ${count} 件`;
+          targetFilter = 'PENDING_APPROVAL';
+          buttonLabel = '聚焦：待主管核准';
+        } else if (currentRole === 'WAREHOUSE') {
+          const count = statusCounts['ARRIVED_INSPECTING'] || 0;
+          focusText = `待您到貨點收與驗收入庫的案件共有 ${count} 件`;
+          targetFilter = 'ARRIVED_INSPECTING';
+          buttonLabel = '聚焦：待驗收入庫';
+        } else if (currentRole === 'OPERATOR') {
+          focusText = '您可查看個人提報案件進度，或隨時點擊右上角「現場拍照提報」';
+        }
+
+        return (
+          <div className="bg-white border border-slate-200 rounded-xl p-3 sm:px-4 sm:py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center space-x-2.5 text-xs">
+              <span className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${roleInfo.color}`}>
+                <UserCheck className="w-3.5 h-3.5" />
+              </span>
+              <div>
+                <span className="font-bold text-slate-900">
+                  當前身分：{roleInfo.label} ({roleInfo.userName})
+                </span>
+                <span className="text-slate-500 ml-2">
+                  {focusText}
+                </span>
+              </div>
+            </div>
+
+            {targetFilter && (
+              <button
+                onClick={() => setSelectedStatusFilter(targetFilter!)}
+                className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shrink-0 shadow-2xs"
+              >
+                {buttonLabel}
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Filter Tabs & Search */}
       <div className="bg-white border border-slate-200 rounded-xl p-3.5 space-y-3 shadow-xs">
