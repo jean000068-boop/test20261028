@@ -1,0 +1,8 @@
+{
+  "name": "回收PP造粒零件辨識與採購管理系統",
+  "description": "回收PP造粒產業專用之設備零件辨識、庫存查詢與採購追蹤管理系統 (MVP 第一版)。支援現場拍照需求提報、AI 零件外觀輔助比對、規格審核、出入庫及採購全流程追蹤。",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
