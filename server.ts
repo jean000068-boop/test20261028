@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { GoogleGenAI, Type } from '@google/genai';
@@ -37,6 +38,16 @@ app.get('/api/health', (req, res) => {
     geminiConfigured: !!apiKey,
     timestamp: new Date().toISOString(),
   });
+});
+
+// Download built dist.zip endpoint
+app.get('/api/download-dist', (req, res) => {
+  const distZipPath = path.resolve(__dirname, 'dist.zip');
+  if (fs.existsSync(distZipPath)) {
+    res.download(distZipPath, 'pp-pellet-system-dist.zip');
+  } else {
+    res.status(404).send('dist.zip not found. Please build first.');
+  }
 });
 
 // AI Multimodal Part Identification Endpoint
