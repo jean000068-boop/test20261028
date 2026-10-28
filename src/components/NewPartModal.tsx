@@ -14,8 +14,6 @@ export const NewPartModal: React.FC<NewPartModalProps> = ({
   onClose,
   onAddPart,
 }) => {
-  if (!isOpen) return null;
-
   const [code, setCode] = useState<string>(`PP-EXT-0${Math.floor(50 + Math.random() * 40)}`);
   const [name, setName] = useState<string>('');
   const [alias, setAlias] = useState<string>('');
@@ -42,6 +40,8 @@ export const NewPartModal: React.FC<NewPartModalProps> = ({
   );
 
   const selectedEquipment = EQUIPMENT_LIST.find((e) => e.code === equipmentCode) || EQUIPMENT_LIST[0];
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
