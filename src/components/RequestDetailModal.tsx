@@ -60,8 +60,8 @@ export const RequestDetailModal: React.FC<RequestDetailModalProps> = ({
   const [quotedPriceInput, setQuotedPriceInput] = useState<number>(requisition?.quotedUnitPrice || 1850);
   const [leadDaysInput, setLeadDaysInput] = useState<number>(requisition?.estimatedLeadDays || 4);
   const [approvalRemarksInput, setApprovalRemarksInput] = useState<string>('核准採購，請採購儘速向配合廠商下單發貨。');
-  const [poNumberInput, setPoNumberInput] = useState<string>(requisition.poNumber || `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-01`);
-  const [actualPriceInput, setActualPriceInput] = useState<number>(requisition.quotedUnitPrice || 1850);
+  const [poNumberInput, setPoNumberInput] = useState<string>(requisition?.poNumber || `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-01`);
+  const [actualPriceInput, setActualPriceInput] = useState<number>(requisition?.quotedUnitPrice || 1850);
   const [inspectionNotes, setInspectionNotes] = useState<string>('零件外觀無碰傷、尺寸與安裝孔位精確，驗收合格。');
 
   if (!requisition) return null;
